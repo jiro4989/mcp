@@ -13,6 +13,7 @@ binDir        = "bin"
 
 requires "nim >= 1.0.6"
 requires "cligen >= 0.9.32"
+requires "uuids >= 0.1.10"
 
 import strformat, os
 

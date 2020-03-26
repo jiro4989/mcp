@@ -1,13 +1,28 @@
 import os, osproc, strutils, logging
 from sequtils import mapIt
 import uuids
-import clitools/util
 
 const
   version = """mcp version 1.0.0
 Copyright (c) 2020 jiro4989
 Released under the MIT License.
 https://github.com/jiro4989/mcp"""
+
+proc getArgsOrStdinLines*(args: seq[string]): seq[string] =
+  result = args
+  if result.len < 1:
+    for line in stdin.lines:
+      result.add(line)
+
+proc editTmpFile*(srcs: seq[string]): (string, string) =
+  let tmpfile = getTempDir() / $genUUID() & ".txt"
+  defer: removeFile(tmpfile)
+  let srcBody = srcs.join("\n")
+  writeFile(tmpfile, srcBody)
+
+  let editor = getEnv("EDITOR", "vi")
+  discard execCmd(editor & " " & tmpfile)
+  result = (srcBody, readFile(tmpfile))
 
 proc copyFileAndDir(srcs, dsts: seq[string]): seq[string] =
   if srcs.len != dsts.len:
